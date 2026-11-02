@@ -3,99 +3,181 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 st.set_page_config(
-    page_title="Nova AI | Your AI Assistant",
+    page_title="Nova AI | Assistant",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ---------- CUSTOM DESIGN ----------
+# ---------- CUSTOM CSS ----------
 st.markdown("""
 <style>
+/* Main page */
 .stApp {
-    background: linear-gradient(135deg, #0b1020 0%, #11152b 55%, #17102b 100%);
-    color: #f1f5f9;
-}
-
-[data-testid="stSidebar"] {
     background: #0b1020;
-    border-right: 1px solid #29304a;
+    color: #f8fafc;
 }
 
-.hero {
-    padding: 28px 20px;
-    border: 1px solid #34365f;
+/* Hide default Streamlit top decoration */
+[data-testid="stDecoration"] {
+    display: none;
+}
+
+/* Main content spacing */
+.block-container {
+    max-width: 1050px;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: #10172a;
+    border-right: 1px solid #27334d;
+}
+
+[data-testid="stSidebar"] * {
+    color: #eef2ff !important;
+}
+
+/* Header */
+.nova-header {
+    background: linear-gradient(120deg, #172554, #312e81, #164e63);
+    border: 1px solid #3c4b82;
+    padding: 30px 24px;
     border-radius: 22px;
-    background: linear-gradient(120deg, #20264b, #302052, #172c4a);
-    text-align: center;
     margin-bottom: 25px;
+    text-align: center;
 }
 
-.hero h1 {
-    font-size: 38px;
-    color: #ffffff;
-    margin-bottom: 8px;
+.nova-header h1 {
+    color: #ffffff !important;
+    font-size: 38px !important;
+    font-weight: 800 !important;
+    margin: 0;
 }
 
-.hero p {
-    color: #c4c9e8;
+.nova-header p {
+    color: #e0e7ff !important;
     font-size: 16px;
+    margin-top: 10px;
 }
 
-.badge {
+.nova-label {
     display: inline-block;
-    background: #34305f;
-    color: #c9c4ff;
-    padding: 6px 14px;
+    color: #ddd6fe !important;
+    background: #312e81;
+    border: 1px solid #6366f1;
     border-radius: 30px;
-    font-size: 13px;
-    margin-bottom: 10px;
+    padding: 5px 13px;
+    margin-bottom: 12px;
+    font-size: 12px;
 }
 
-div[data-testid="stChatMessage"] {
-    background: rgba(31, 41, 70, 0.72);
-    border: 1px solid #343b5a;
+/* General text */
+.stApp p,
+.stApp label,
+.stMarkdown,
+.stMarkdown p {
+    color: #e5e7eb;
+}
+
+/* Chat messages */
+[data-testid="stChatMessage"] {
+    background: #151e33;
+    border: 1px solid #303d59;
     border-radius: 18px;
-    padding: 15px;
+    padding: 16px;
     margin-bottom: 12px;
 }
 
-div[data-testid="stChatInput"] {
-    border: 1px solid #6264c7;
-    border-radius: 16px;
+/* Make chat response text readable */
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] li {
+    color: #f8fafc !important;
+    font-size: 16px !important;
+    line-height: 1.75 !important;
 }
 
-div.stButton > button {
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid #454875;
-    background: #202541;
-    color: white;
-    padding: 10px;
+/* Chat input container */
+[data-testid="stChatInput"] {
+    background: #151e33 !important;
+    border: 1px solid #6366f1 !important;
+    border-radius: 16px !important;
 }
 
-div.stButton > button:hover {
-    border-color: #9991ff;
-    color: #c7c3ff;
+/* Input and textarea text */
+[data-testid="stChatInput"] textarea {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #a5b4fc !important;
+    background: #151e33 !important;
+    font-size: 16px !important;
 }
 
-.footer {
+/* Placeholder */
+[data-testid="stChatInput"] textarea::placeholder {
+    color: #b8c3d9 !important;
+    -webkit-text-fill-color: #b8c3d9 !important;
+    opacity: 1 !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background: #1a2540 !important;
+    color: #ffffff !important;
+    border: 1px solid #475569 !important;
+    border-radius: 12px !important;
+    min-height: 45px;
+    transition: 0.2s;
+}
+
+.stButton > button:hover {
+    background: #3730a3 !important;
+    border-color: #818cf8 !important;
+    color: #ffffff !important;
+}
+
+/* Status messages */
+[data-testid="stStatusWidget"] {
+    color: #ffffff !important;
+}
+
+/* Footer */
+.nova-footer {
     text-align: center;
-    color: #9099b8;
-    font-size: 12px;
-    padding: 20px 0;
+    color: #94a3b8 !important;
+    font-size: 13px;
+    padding: 24px 0 8px 0;
 }
 
+/* Small screen adjustments */
+@media (max-width: 640px) {
+    .nova-header {
+        padding: 22px 12px;
+    }
+
+    .nova-header h1 {
+        font-size: 29px !important;
+    }
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
+
 # ---------- SIDEBAR ----------
 with st.sidebar:
-    st.markdown("## 🤖 Nova AI")
-    st.caption("Your personal AI assistant")
-    st.markdown("---")
+    st.markdown("# 🤖 Nova AI")
+    st.caption("YOUR PERSONAL AI ASSISTANT")
+    st.divider()
 
-    if st.button("＋ New Chat", use_container_width=True):
+    if st.button("＋  New Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
 
@@ -105,11 +187,13 @@ with st.sidebar:
     st.caption("📚 Help me learn English")
     st.caption("🚀 Give me project ideas")
 
-    st.markdown("---")
-    st.caption("🧠 Model: Qwen 2.5")
-    st.caption("⚡ Powered by Transformers")
+    st.divider()
+    st.markdown("### 🧠 About")
+    st.caption("Model: Qwen 2.5 0.5B")
+    st.caption("Built with Streamlit")
 
-# ---------- LOAD AI MODEL ----------
+
+# ---------- AI MODEL ----------
 @st.cache_resource
 def load_model():
     name = "Qwen/Qwen2.5-0.5B-Instruct"
@@ -120,51 +204,61 @@ def load_model():
 
     return tokenizer, model
 
+
 # ---------- HEADER ----------
 st.markdown("""
-<div class="hero">
-    <div class="badge">✦ YOUR AI ASSISTANT</div>
-    <h1>Meet Nova AI 🤖</h1>
-    <p>Ask questions, explore ideas, and learn something new.</p>
+<div class="nova-header">
+    <div class="nova-label">✦ AI POWERED ASSISTANT</div>
+    <h1>Nova AI 🤖</h1>
+    <p>Ask anything. Learn anything. Explore new ideas.</p>
 </div>
 """, unsafe_allow_html=True)
 
-# ---------- CHAT HISTORY ----------
+
+# ---------- CHAT STATE ----------
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Display existing messages
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# ---------- EXAMPLE PROMPTS ----------
+
+# ---------- WELCOME SCREEN ----------
 if not st.session_state.messages:
     st.markdown("### ✨ What can I help you with today?")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        ask_python = st.button("💻 Explain Python", use_container_width=True)
-        ask_ai = st.button("🧠 What is AI?", use_container_width=True)
+        if st.button("💻  Explain Python", use_container_width=True):
+            st.session_state.pending_question = (
+                "Explain Python in simple words."
+            )
+            st.rerun()
+
+        if st.button("🧠  What is AI?", use_container_width=True):
+            st.session_state.pending_question = (
+                "What is Artificial Intelligence?"
+            )
+            st.rerun()
 
     with col2:
-        ask_english = st.button("📚 Help me learn English", use_container_width=True)
-        ask_ideas = st.button("🚀 Give me project ideas", use_container_width=True)
+        if st.button("📚  Learn English", use_container_width=True):
+            st.session_state.pending_question = (
+                "Give me some tips to learn English."
+            )
+            st.rerun()
 
-    if ask_python:
-        st.session_state.pending_question = "Explain Python in simple words."
-        st.rerun()
-    elif ask_ai:
-        st.session_state.pending_question = "What is Artificial Intelligence?"
-        st.rerun()
-    elif ask_english:
-        st.session_state.pending_question = "Help me learn English."
-        st.rerun()
-    elif ask_ideas:
-        st.session_state.pending_question = "Give me beginner AI project ideas."
-        st.rerun()
+        if st.button("🚀  Project Ideas", use_container_width=True):
+            st.session_state.pending_question = (
+                "Suggest three beginner-friendly AI projects."
+            )
+            st.rerun()
 
-# ---------- USER INPUT ----------
+
+# ---------- CHAT INPUT ----------
 question = st.chat_input("Message Nova AI...")
 
 if question:
@@ -181,16 +275,17 @@ if st.session_state.get("pending_question"):
         st.markdown(question)
 
     try:
-        with st.spinner("🔄 Loading AI model..."):
+        with st.spinner("Loading AI model..."):
             tokenizer, model = load_model()
 
         conversation = [
             {
                 "role": "system",
                 "content": (
-                    "You are Nova AI, a helpful and friendly assistant. "
-                    "Answer clearly and simply. If you do not know something, "
-                    "be honest. Do not claim to have searched the internet."
+                    "You are Nova AI, a helpful assistant. "
+                    "Give clear, useful, simple answers. "
+                    "Use readable paragraphs and lists when helpful. "
+                    "Be honest if you do not know something."
                 )
             }
         ]
@@ -206,7 +301,7 @@ if st.session_state.get("pending_question"):
         inputs = tokenizer(prompt, return_tensors="pt")
 
         with st.chat_message("assistant"):
-            with st.spinner("✨ Nova AI is thinking..."):
+            with st.spinner("Nova AI is thinking..."):
                 with torch.no_grad():
                     outputs = model.generate(
                         **inputs,
@@ -216,7 +311,9 @@ if st.session_state.get("pending_question"):
                         top_p=0.9
                     )
 
-                answer = outputs[0][inputs["input_ids"].shape[1]:]
+                answer = outputs[0][
+                    inputs["input_ids"].shape[1]:
+                ]
 
                 reply = tokenizer.decode(
                     answer,
@@ -224,7 +321,10 @@ if st.session_state.get("pending_question"):
                 ).strip()
 
                 if not reply:
-                    reply = "Sorry, I couldn't generate an answer. Please try again."
+                    reply = (
+                        "I couldn't generate a response. "
+                        "Please try asking in a different way."
+                    )
 
                 st.markdown(reply)
 
@@ -233,12 +333,13 @@ if st.session_state.get("pending_question"):
         )
 
     except Exception as e:
-        st.error("Sorry! The AI model could not generate a response.")
+        st.error("The AI model could not respond.")
         st.code(str(e))
+
 
 # ---------- FOOTER ----------
 st.markdown("""
-<div class="footer">
-    Made with ❤️ using Streamlit and Qwen AI
+<div class="nova-footer">
+    Made with ❤️ | Nova AI · Your AI Assistant
 </div>
 """, unsafe_allow_html=True)
