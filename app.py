@@ -16,6 +16,24 @@ st.markdown("""
 .stApp {
     background: #0b1020;
     color: #f8fafc;
+    ```css
+/* Remove extra space from top */
+.block-container {
+    padding-top: 0.5rem !important;
+    margin-top: 0 !important;
+}
+
+/* Remove top space from header */
+header[data-testid="stHeader"] {
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* Hide Streamlit top decoration */
+div[data-testid="stDecoration"] {
+    display: none !important;
+}
+```
 }
 
 /* Hide default Streamlit top decoration */
